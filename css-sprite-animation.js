@@ -1,5 +1,5 @@
 /* ----------------------------------------
-css-sprite-animation.js 1.0.0
+css-sprite-animation.js 1.0.1
 CSSでスプライトアニメする
 
 Note:
@@ -34,6 +34,8 @@ var CSSSA = function(settings){
 
 	// check if steps() is available
 	var isAvailableSteps = false;
+	// using steps on iOS5.* let the animation slow, so disable it.
+	/*
 	var tempElem = document.createElement("div");
 	document.body.appendChild(tempElem);
 	tempElem.style.webkitAnimationTimingFunction = "steps(10,end)";
@@ -44,7 +46,7 @@ var CSSSA = function(settings){
 	document.body.removeChild(tempElem);
 	delete style;
 	delete tempElem;
-
+	*/
 	// 再生間隔
 	var duration =~~(1000/this.fps*this.frames);
 
