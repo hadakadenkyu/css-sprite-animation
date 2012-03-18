@@ -1,5 +1,5 @@
 /* ----------------------------------------
-css-sprite-animation.js 1.1.0
+css-sprite-animation.js 1.2.0
 CSSでスプライトアニメする
 
 Note:
@@ -7,7 +7,7 @@ Use:CSSでスプライトシートをアニメさせる
 Required:webkit採用ブラウザであること、HTML5であること
 Usage:
 ・新規作成
-var anime = new CSSSA({name:"animation-name",src:"sprite.png",fps:12,width:240,height:160,frames:10,column:10});
+var anime = new CSSSA({name:"animation-name",src:"sprite.png",fps:12,width:240,height:160,frames:10,column:10,iterationCount:"infinite"});
 ・elemプロパティに生成されたDOMオブジェクトが入っているので必要な場所にappendChildする
 document.getElementById("stage").appendChild(anime.elem);
 ・再生
@@ -19,9 +19,7 @@ anime.stop();
 ---------------------------------------- */
 var CSSSA = function(settings){
 	this.name = settings.name;
-	this.elem = document.createElement('div');
-	var className = this.name + "_anime";
-	this.elem.className = className;
+	var className = this.name + "-anime";
 	this.fps = settings.fps;
 	this.frames = settings.frames;
 	var column;
@@ -32,14 +30,29 @@ var CSSSA = function(settings){
 	}
 	this.width = settings.width;
 	this.height = settings.height;
-	
+	if (settings.iterationCount === undefined){
+		this.iterationCount = 1;
+	} else{
+		this.iterationCount = settings.iterationCount;
+	}
+	// 再生間隔
+	var duration = this.duration =~~(1000/this.fps*this.frames);
+
+	// DOM要素作成
+	this.elem = document.createElement('div');
+	this.elem.className = className;
 	var spriteImg = new Image();
 	spriteImg.src = settings.src;
 	this.elem.appendChild(spriteImg);
-	var self = this;
 
-	// 再生間隔
-	var duration =~~(1000/this.fps*this.frames);
+	var styleId = this.name+"-style";
+	var styleTag = document.createElement("style");
+	// 既にCSSがあればreturnする
+	if(document.getElementById(styleId)){
+		return;
+	}
+	styleTag.id = styleId;
+	document.getElementsByTagName('head')[0].appendChild(styleTag);
 
 	var cssText = "";
 	// デフォルト時のCSSを作る
@@ -64,10 +77,10 @@ var CSSSA = function(settings){
 		frameX = i%column * this.width * -1;
 		frameY = Math.floor(i/column)*this.height * -1;
 		if(navigator.userAgent.indexOf("Android") != -1){
-			keyframesArray[i] = "left:"+ frameX + "px;\n";
-			keyframesArray[i] += "top:"+ frameY + "px;\n";
+			keyframesArray[i] = "left:" + frameX + "px;\n";
+			keyframesArray[i] += "top:" + frameY + "px;\n";
 		}else{
-			keyframesArray[i] = "-webkit-transform:translate3d(" + frameX + "px,"+frameY+"px,0);\n";
+			keyframesArray[i] = "-webkit-transform:translate3d(" + frameX + "px," + frameY + "px,0);\n";
 		}
 	};
 
@@ -83,12 +96,11 @@ var CSSSA = function(settings){
 	}
 
 	// @-webkit-keyframes を作成する
-	var timingFunction = "";
 	cssText += "@-webkit-keyframes kf-"+this.name+"{\n";
 	for(var i=0;i<this.frames;i++){
 		var fromPercent = (i/this.frames*100).toFixed(digits)+"%";
 		if(i == 0){
-			var fromPercent = "from";
+			fromPercent = "from";
 		}
 		var toPercent = ((i+1)/this.frames*100-tick).toFixed(digits)+"%";
 		if(i == (this.frames-1)){
@@ -98,15 +110,14 @@ var CSSSA = function(settings){
 		cssText += keyframesArray[i];
 		cssText += "}\n";
 	}
-	timingFunction = "linear";
 	cssText += "}\n";
 	// div.id.play で再生するようにする
 	cssText += "." + className + "[data-play-state='play'] > img,\n";
 	cssText += "." + className + "[data-play-state='pause'] > img{\n";
 	cssText += "-webkit-animation-name:kf-"+this.name+";\n";
 	cssText += "-webkit-animation-duration:" + duration + "ms;\n";
-	cssText += "-webkit-animation-iteration-count:infinite;\n";
-	cssText += "-webkit-animation-timing-function:"+ timingFunction +";\n";
+	cssText += "-webkit-animation-iteration-count:"+this.iterationCount+";\n";
+	cssText += "-webkit-animation-timing-function:linear;\n";
 	cssText += "}\n";
 	cssText += "." + className + "[data-play-state='play'] > img{\n";
 	cssText += "-webkit-animation-play-state:running;\n";
@@ -117,13 +128,7 @@ var CSSSA = function(settings){
 
 	// cssText結合
 	var styleText = document.createTextNode(cssText);
-	var styleTag = document.createElement("style");
-	styleTag.id = this.name+"_style";
-	styleTag.setAttribute("scoped","scoped");
 	styleTag.appendChild(styleText);
-
-	// scopedにしてelemにstyleタグ追加
-	this.elem.appendChild(styleTag);
 }
 CSSSA.prototype = {
 	play: function(){
