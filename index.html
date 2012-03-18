@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<title>css-sprite-animation</title>
+<link rel="stylesheet/less" type="text/css" href="./css/reset.less" />
+<link rel="stylesheet/less" type="text/css" href="./css/main.less" />
+</head>
+<body>
+<h1>css-sprite-animation.js</h1>
+<article>
+<h2>説明</h2>
+<p>
+-webkit-animationで動くスプライトアニメーションを作ります。<br/>
+-webkit-transform:translate3dを利用しているため、iPhone上でも滑らかに動きます。
+</p>
+<h2>サンプル</h2>
+<h3>元画像 (出典:<a href="http://www.thebest3d.com/pda/tutorials/array2animation/index2.html">http://www.thebest3d.com/pda/tutorials/array2animation/index2.html</a>)</h3>
+<img src="http://www.thebest3d.com/pda/tutorials/array2animation/walksequence_spritesheet.png" alt="" width="360" />
+<h3>アニメ</h3>
+<div id="sample"></div>
+<h2>コード</h2>
+<pre><code>
+(function(){
+	var settings = {
+		name : "run",
+		src:"http://www.thebest3d.com/pda/tutorials/array2animation/walksequence_spritesheet.png",
+		width:240,
+		height:296,
+		fps:24,
+		frames:30,
+		column:6,
+		iterationCount:"infinite"
+	}
+	var anime = new CSSSA(settings);
+	$(anime.elem).appendTo("#sample");
+	anime.play();
+})();
+</code></pre>
+
+</article>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="./js/css-sprite-animation.js"></script>
+<script src="./js/less-1.3.0.min.js"></script>
+<script>
+(function(){
+	var settings = {
+		name : "run",
+		src:"http://www.thebest3d.com/pda/tutorials/array2animation/walksequence_spritesheet.png",
+		width:240,
+		height:296,
+		fps:24,
+		frames:30,
+		column:6,
+		iterationCount:"infinite"
+	}
+	var anime = new CSSSA(settings);
+	$(anime.elem).appendTo("#sample");
+	anime.play();
+})();
+</script>
+</body>
+</html>
